@@ -1,0 +1,261 @@
+=> Git is a version control tool
+=> GitHub is a service to host Git projects
+
+
+
+#Navigating The Log
+If you're not used to a pager on the command line, navigating in Less can be a bit odd. Here are some helpful keys:
+
+to scroll down, press
+j or ↓ to move down one line at a time
+d to move by half the page screen
+f to move by a whole page screen
+to scroll up, press
+k or ↑ to move up one line at a time
+u to move by half the page screen
+b to move by a whole page screen
+press q to quit out of the log (returns to the regular command prompt)
+
+# git log
+The git log command is used to display all of the commits of a repository.
+
+> git log --oneline
+We just looked at the --oneline flag to show one commit per line.
+
+> git log --stat
+The git log command has a flag that can be used to display the files that have been changed in the commit, as well as the number of lines that have been added or deleted. The flag is --stat ("stat" is short for "statistics"):
+
+> git log -p
+The git log command has a flag that can be used to display the actual changes made to a file. The flag is --patch which can be shortened to just -p.
+
+> git show 2efaafd
+
+
+> git log --oneline --decorate --graph --all
+The --graph flag adds the bullets and lines to the leftmost part of the output. This shows the actual branching that's happening. The --all flag is what displays all of the branches in the repository.
+
+#Merge
+
+> git merge <name-of-branch-to-merge-in>
+
+As of right now, we do not know how to undo changes. We'll go over it in the next lesson, but if you make a merge on the wrong branch, use this command to undo the merge:
+
+> git reset --hard HEAD^
+
+-(Make sure to include the ^ character! It's a known as a "Relative Commit Reference" and indicates "the parent commit". We'll look at Relative Commit References in the next lesson.)
+
+
+
+#Changing The Last Commit
+If your Working Directory is clean (meaning there aren't any uncommitted changes in the repository), then running git commit --amend will let you provide a new commit message. Your code editor will open up and display the original commit message. Just fix a misspelling or completely reword it! Then save it and close the editor to lock in the new commit message.
+> git commit --amend
+
+#Add Forgotten Files To Commit
+
+edit the file(s)
+save the file(s)
+stage the file(s)
+and run 
+> git commit --amend
+
+-------------	
+
+> git revert <SHA-of-commit-to-revert>
+To recap, the git revert command is used to reverse a previously made commit:
+
+#Reset vs Revert
+
+At first glance, resetting might seem coincidentally close to reverting, but they are actually quite different. Reverting creates a new commit that reverts or undos a previous commit. Resetting, on the other hand, erases commits!
+
+> git reset HEAD^
+
+Relative Commit References
+You already know that you can reference commits by their SHA, by tags, branches, and the special HEAD pointer. Sometimes that's not enough, though. There will be times when you'll want to reference a commit relative to another commit. For example, there will be times where you'll want to tell Git about the commit that's one before the current commit...or two before the current commit. There are special characters called "Ancestry References" that we can use to tell Git about these relative references. Those characters are:
+
+^ – indicates the parent commit
+~ – indicates the first parent commit
+Here's how we can refer to previous commits:
+
+the parent commit – the following indicate the parent commit of the current commit
+HEAD^
+HEAD~
+HEAD~1
+the grandparent commit – the following indicate the grandparent commit of the current commit
+HEAD^^
+HEAD~2
+the great-grandparent commit – the following indicate the great-grandparent commit of the current commit
+HEAD^^^
+HEAD~3
+The main difference between the ^ and the ~ is when a commit is created from a merge. A merge commit has two parents. With a merge commit, the ^ reference is used to indicate the first parent of the commit while ^2 indicates the second parent. The first parent is the branch you were on when you ran git merge while the second parent is the branch that was merged in.
+
+
+Git Reset's Flags
+The way that Git determines if it erases, stages previously committed changes, or unstages previously committed changes is by the flag that's used. The flags are:
+
+--mixed : unstages committed changes / work directory (default)
+--soft : moves committed changes to the staging index
+--hard : erase commits
+
+
+💡 Backup Branch 💡
+Remember that using the git reset command will erase commits from the current branch. So if you want to follow along with all the resetting stuff that's coming up, you'll need to create a branch on the current commit that you can use as a backup.
+
+Before I do any resetting, I usually create a backup branch on the most-recent commit so that I can get back to the commits if I make a mistake:
+
+> git branch backup
+
+💡 Back To Normal 💡
+If you created the backup branch prior to resetting anything, then you can easily get back to having the master branch point to the same commit as the backup branch. You'll just need to:
+
+1-remove the uncommitted changes from the working directory
+2-merge backup into master (which will cause a Fast-forward merge and move master up to the same point as backup)
+$ git checkout -- index.html
+$ git merge backup
+
+
+
+--------------------------
+
+#Remote repository
+
+create a connection from my local repository to the remote repository:
+> git remote add origin https://github.com/richardkalehoff/RichardsFantasticProject.git
+
+If you want to see the full path to the remote repository, then all you have to do is use the -v flag:
+> git remote -v
+
+Sending Commits
+> git push <remote-shortname> <branch>
+
+
+---------------
+* b8e0359 (HEAD -> master, origin/master) Style destination
+* 27028b3 add starting distination
+
+We now have a new marker in the output! This marker is origin/master and is called a tracking branch. A tracking branch's name includes the shortname of the remote repository as well as the name of the branch. So the tracking branch origin/master is telling us that the remote origin has a master branch that points to commit 9b7d28f (and includes all of the commits before 9b7d28f). This is really helpful because this means we can track the information of the remote Repository right here in our local one!
+
+----------------------------------
+Pull changes from a remote
+> git pull <remote-shortname> <branch>
+
+If you don't want to automatically merge the local branch with the tracking branch then you wouldn't use git pull you would use a different command called git fetch. You might want to do this if there are commits on the repository that you don't have but there are also commits on the local repository that the remote one doesn't have either.
+
+> git fetch <remote-shortname> <branch>
+
+
+Recap
+You can think of the git pull command as doing two things:
+
+fetching remote changes (which adds the commits to the local repository and moves the tracking branch to point to them)
+merging the local branch with the tracking branch
+The git fetch command is just the first step. It just retrieves the commits and moves the tracking branch. It does not merge the local branch with the tracking branch. The same information provided to git pull is passed to git fetch:
+
+the shorname of the remote repository
+the branch with commits to retrieve
+$ git fetch origin master
+
+
+-----------------------------------
+#Fork
+
+In version control terminology if you "fork" a repository that means you duplicate it.
+
+
+-----------------------------------
+Group By Commit Author
+
+> git shortlog
+
+git shortlog displays an alphabetical list of names and the commit messages that go along with them. If we just want to see just the number of commits that each developer has made, we can add a couple of flags: -s to show just the number of commits (rather than each commit's message) and -n to sort them numerically (rather than alphabetically by author name).
+
+> git shortlog -s -n
+
+
+Filter By Author
+
+> git log --author="fathi lakdhar"
+
+
+Filter By Commit message/description
+
+> git log --grep="bug"
+Git will display only the commits that have
+----------------------------------
+
+Determining What To Work On
+
+Recap
+Before you start doing any work, make sure to look for the project's CONTRIBUTING.md file.
+
+Next, it's a good idea to look at the GitHub issues for the project
+
+look at the existing issues to see if one is similar to the change you want to contribute
+if necessary create a new issue
+communicate the changes you'd like to make to the project maintainer in the issue
+When you start developing, commit all of your work on a topic branch:
+
+do not work on the master branch
+make sure to give the topic branch clear, descriptive name
+As a general best practice for writing commits:
+
+make frequent, smaller commits
+use clear and descriptive commit messages
+update the README file, if necessary
+
+----------------------------------
+⚠️ Resetting Remote Names ⚠️
+The image above demos the renaming of the remotes, but I have returned them to their default/defacto names of origin and upstream with the following commands:
+
+$ git remote rename mine origin
+$ git remote rename source-repo upstream
+
+
+
+# to make sure I'm on the correct branch for merging
+$ git checkout master
+
+# merge in Lam's changes
+$ git merge upstream/master
+
+# send Lam's changes to *my* remote
+$ git push origin master
+
+---------------------------------------
+Squash Commits
+
+To squash commits together, we're going to use the extremely powerful git rebase command. 
+
+> git rebase -i HEAD~3
+
+		   4(MASTER)
+		  /
+a-3-d-f-8/-2-c-b(BACKUP)
+
+(2-c-b) -> 4
+--------------------------------------------
+#The Rebase Command
+The git rebase command will move commits to have a new base. In the command git rebase -i HEAD~3, we're telling Git to use HEAD~3 as the base where all of the other commits (HEAD~2, HEAD~1, and HEAD) will connect to.
+
+The -i in the command stands for "interactive". You can perform a rebase in a non-interactive mode. While you're learning how to rebase, though, I definitely recommend that you do interactive rebasing.
+
+#Rebase Commands
+Let's take another look at the different commands that you can do with git rebase:
+
+use p or pick – to keep the commit as is
+use r or reword – to keep the commit's content but alter the commit message
+use e or edit – to keep the commit's content but stop before committing so that you can:
+add new content or files
+remove content or files
+alter the content that was going to be committed
+use s or squash – to combine this commit's changes into the previous commit (the commit above it in the list)
+use f or fixup – to combine this commit's change into the previous one but drop the commit message
+use x or exec – to run a shell command
+use d or drop – to delete the commit
+
+
+
+---------------------------------------------
+First Pull Request
+What was the first pull request you sent on GitHub?
+
+http://firstpr.me/#fathi.lakdhar@yahoo.fr
